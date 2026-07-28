@@ -1,5 +1,7 @@
 """Simple retrieval verification script."""
 
+from __future__ import annotations
+
 from retrieval import retrieve
 
 
@@ -12,17 +14,22 @@ TEST_QUERIES = [
 ]
 
 
+def print_results(query: str) -> None:
+    """Print retrieval results for a single query."""
+    print(f"QUERY: {query}")
+    results = retrieve(query)
+    if not results:
+        print("NO MATCH")
+    else:
+        for result in results:
+            print(f"- {result['title']} ({result['score']:.3f})")
+    print()
+
+
 def main() -> None:
     """Print retrieval results for a fixed set of test queries."""
     for query in TEST_QUERIES:
-        print(f"QUERY: {query}")
-        results = retrieve(query)
-        if not results:
-            print("NO MATCH")
-        else:
-            for result in results:
-                print(f"- {result['title']} ({result['score']:.3f})")
-        print()
+        print_results(query)
 
 
 if __name__ == "__main__":
