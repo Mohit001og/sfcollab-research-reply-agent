@@ -1,0 +1,152 @@
+[
+  {
+    "id": "profile-setup-01",
+    "title": "How do I complete my co-founder profile?",
+    "content": "A strong profile helps SFCollab show your startup to the right people. Add a clear headline, your current stage, what kind of co-founder you need, and a short summary of your background. Profiles with a filled-in role, location, and availability tend to receive more relevant suggestions."
+  },
+  {
+    "id": "profile-setup-02",
+    "title": "How do I update my profile picture?",
+    "content": "Go to Profile Settings and open the photo section to upload a new image. We recommend a recent headshot with good lighting so match cards feel more trustworthy. If the upload fails, try a smaller JPG or PNG file and refresh the page before retrying."
+  },
+  {
+    "id": "profile-setup-03",
+    "title": "How do I change my startup stage or role?",
+    "content": "You can edit your startup stage, role, and focus areas from your profile editor at any time. These fields help tailor your match cards and co-founder suggestions. Updating them after a pivot is a good idea because stale information can reduce match quality."
+  },
+  {
+    "id": "profile-setup-04",
+    "title": "Can I make my profile stronger for better suggestions?",
+    "content": "Yes. Add a concise product description, your technical or business strengths, and the type of partner you're looking for. Profiles that mention specifics like industry, geography, or a preferred work style usually get more accurate recommendations."
+  },
+  {
+    "id": "profile-setup-05",
+    "title": "Why is my profile still showing as incomplete?",
+    "content": "A profile usually stays incomplete until you fill the required fields: name, headline, startup summary, and at least one role preference. If you added everything but still see the banner, refresh the page and check whether a draft field was left unsaved. In rare cases, a browser session issue can delay the status update."
+  },
+  {
+    "id": "matching-01",
+    "title": "How do co-founder matches work?",
+    "content": "SFCollab ranks people by shared startup stage, role fit, location, and the preferences you set in your profile. Each match card surfaces a reason for the recommendation so you can understand why someone appeared. The system also weighs recent activity, because active members are more likely to respond to invites."
+  },
+  {
+    "id": "matching-02",
+    "title": "Why am I not seeing more co-founder matches?",
+    "content": "If your match feed feels thin, it is usually because your filters are too narrow or your profile is missing key signals. Broadening location, startup stage, or role preferences can immediately expand the pool. Another common cause is that nearby candidates have already been exhausted for your current criteria."
+  },
+  {
+    "id": "matching-03",
+    "title": "How can I improve the quality of my match cards?",
+    "content": "Add detail to your profile about your product, preferred co-founder skills, and how far along the idea is. Match cards become more useful when the system has a clear picture of what you are building and what gap you need to fill. Saving those changes can shift the next batch of suggestions within a few refreshes."
+  },
+  {
+    "id": "matching-04",
+    "title": "Can I hide a match or say not interested?",
+    "content": "Yes. Use the not interested action on a match card to remove that person from future suggestions. Hiding a card also helps the recommendation engine avoid showing similar profiles repeatedly. You can still revisit your hidden list later from Match History if you change your mind."
+  },
+  {
+    "id": "matching-05",
+    "title": "Why does the same person keep appearing in suggestions?",
+    "content": "Repeated suggestions usually mean that person still fits your filters very well and has not been fully ruled out by your actions. If you keep seeing the same match, try marking it not interested or adjust a filter that is overly specific. The feed refreshes from the same candidate pool, so narrow criteria can cause looped results."
+  },
+  {
+    "id": "matching-06",
+    "title": "What does the compatibility score mean?",
+    "content": "The compatibility score is a directional signal, not a promise of a great partnership. It combines profile overlap, desired role fit, and mutual startup interests to help order the feed. Many founders also use the score alongside the written match reason before sending an invite."
+  },
+  {
+    "id": "messaging-01",
+    "title": "How do I message a potential co-founder?",
+    "content": "Open the match card or profile and tap Message to start a direct conversation. The chat window keeps the context of the match visible so you do not have to reintroduce yourself from scratch. If the other person has not connected yet, you may see the invite prompt first instead of a message box."
+  },
+  {
+    "id": "messaging-02",
+    "title": "What is the difference between invite and message?",
+    "content": "An invite is a request to connect, while a message is a conversation after there is a shared thread or accepted match. Sending an invite is usually the first step when you want to introduce yourself to someone new. Once they accept, you can continue the discussion in the chat view."
+  },
+  {
+    "id": "messaging-03",
+    "title": "Can I edit or delete a message?",
+    "content": "You can edit a recently sent message for a short window, which helps fix typos or soften a rushed first note. Deleted messages disappear from your view, but the recipient may still have already seen them if the thread was open. Use edits sparingly so the conversation stays clear and trustworthy."
+  },
+  {
+    "id": "messaging-04",
+    "title": "Why haven't they replied to my invite?",
+    "content": "Many users review invites in batches, especially if they are comparing several co-founder candidates at once. If your invite is sitting for a while, it may simply be awaiting review rather than rejected. A short follow-up message can help, but keep it specific to their profile and your startup."
+  },
+  {
+    "id": "messaging-05",
+    "title": "Where did my conversation thread go?",
+    "content": "Your active conversations live under Messages and archived threads move out of the main inbox after inactivity. If you cannot find a thread, check the archived view or search by the person's name. Threads can also disappear from the top list if the other user deleted their account."
+  },
+  {
+    "id": "privacy-01",
+    "title": "How do I control who can see my profile?",
+    "content": "Open Visibility Settings to choose whether your profile is public to all members or limited to suggested matches. Public profiles appear more often in search and matching feeds, while private profiles stay hidden from general browsing. You can change this setting whenever your recruiting strategy changes."
+  },
+  {
+    "id": "privacy-02",
+    "title": "Can I hide my exact location?",
+    "content": "Yes. SFCollab lets you show a city or region instead of a precise location so you can stay discoverable without oversharing. This is useful if you are open to remote co-founders but do not want to list your neighborhood or office address. The match engine still uses the broader location for suggestions."
+  },
+  {
+    "id": "privacy-03",
+    "title": "Who can see my messages?",
+    "content": "Messages are private between you and the other participant in the thread. SFCollab does not expose chat contents to the broader community, and match cards do not reveal full message history. Our support team only reviews messages when required to investigate abuse or safety reports."
+  },
+  {
+    "id": "privacy-04",
+    "title": "How do I pause my profile from appearing in recommendations?",
+    "content": "Use the pause visibility control to stop your profile from being shown in fresh match suggestions. Pausing does not delete your account or past conversations, and you can turn it back on when you are ready to network again. It is a good option if you are traveling or focused on product work for a few weeks."
+  },
+  {
+    "id": "billing-01",
+    "title": "How do I upgrade to a paid plan?",
+    "content": "Go to Billing and choose the plan that matches your recruiting needs. Paid plans unlock additional match filters, more visibility controls, and expanded message limits. After checkout, your new features usually appear immediately, but occasionally require a refresh."
+  },
+  {
+    "id": "billing-02",
+    "title": "Why was my card declined?",
+    "content": "A declined payment often means your bank blocked the charge, the card expired, or the billing details do not match. Try re-entering the card after confirming the ZIP code and expiration date. If the issue persists, contact your bank before retrying to avoid repeated failures."
+  },
+  {
+    "id": "billing-03",
+    "title": "Can I switch from monthly to annual billing?",
+    "content": "Yes. You can change your plan cadence from monthly to annual from the Billing page. The switch usually takes effect on the next renewal cycle, and you may see a prorated adjustment depending on when you upgrade. Annual billing is best if you expect to use the platform continuously."
+  },
+  {
+    "id": "billing-04",
+    "title": "Where can I download my receipts?",
+    "content": "Receipts are available in the billing history section of your account. Each invoice shows the payment date, plan name, and the amount charged for that cycle. If you need an older receipt, you can open the archive view and download the PDF copy."
+  },
+  {
+    "id": "troubleshooting-01",
+    "title": "I'm having trouble logging in",
+    "content": "First confirm that you are using the same email address you used when creating your account. If the password is not working, reset it from the sign-in screen and check your spam folder for the link. Persistent login issues can also happen if your browser is blocking cookies or session storage."
+  },
+  {
+    "id": "troubleshooting-02",
+    "title": "I'm not getting email notifications",
+    "content": "Check that notifications are enabled in your account settings and that your email address is verified. If you still are not receiving messages, look in spam or promotions and add SFCollab to your safe sender list. Delivery can also lag if your inbox provider is rate limiting automated mail."
+  },
+  {
+    "id": "troubleshooting-03",
+    "title": "The page is loading slowly or not at all",
+    "content": "Slow loading is often caused by a weak connection, a browser extension, or stale cached data. Refresh the page, try a private window, and disable heavy extensions like ad blockers if the issue continues. If the feed still fails to load, the problem may be temporary on our side."
+  },
+  {
+    "id": "troubleshooting-04",
+    "title": "My match cards stopped refreshing",
+    "content": "Match cards refresh when new candidates are available and when your profile changes enough to alter the recommendation pool. If the feed seems frozen, try clearing filters, updating a profile field, or reloading after a few minutes. In some cases the UI can be delayed by a cached browser session."
+  },
+  {
+    "id": "troubleshooting-05",
+    "title": "Why aren't my notifications showing on mobile?",
+    "content": "Mobile notifications depend on both SFCollab permission settings and your device-level notification controls. Make sure push alerts are allowed for the app and that battery saver mode is not suppressing background updates. If you recently changed phones, you may need to sign in again to re-register the device."
+  },
+  {
+    "id": "troubleshooting-06",
+    "title": "I'm seeing an error after sending an invite",
+    "content": "Invite errors can happen if the other user has paused their profile, blocked you, or the network request timed out. Try sending the invite again after refreshing the page, and check whether the match card is still visible. If the same error repeats, copy the message text and contact support so they can inspect the thread state."
+  }
+]
