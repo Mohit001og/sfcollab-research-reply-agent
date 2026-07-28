@@ -11,6 +11,7 @@ TEST_QUERIES = [
     "I'm not getting email notifications",
     "What's the weather like today?",
     "Can you help me file my taxes?",
+    "how do I delete my account and is that different from just deactivating it",
 ]
 
 

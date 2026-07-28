@@ -148,5 +148,15 @@
     "id": "troubleshooting-06",
     "title": "I'm seeing an error after sending an invite",
     "content": "Invite errors can happen if the other user has paused their profile, blocked you, or the network request timed out. Try sending the invite again after refreshing the page, and check whether the match card is still visible. If the same error repeats, copy the message text and contact support so they can inspect the thread state."
+  },
+  {
+    "id": "account-lifecycle-01",
+    "title": "How do I permanently delete my account?",
+    "content": "Permanent account deletion removes your profile, match history, messages, and saved preferences from active use. This action is not reversible once the deletion request is confirmed, so make sure you really want to close the account before proceeding. To delete the account, open Account Settings, choose Delete Account, and follow the confirmation steps."
+  },
+  {
+    "id": "account-lifecycle-02",
+    "title": "How do I deactivate or pause my account?",
+    "content": "Deactivating your account temporarily hides your profile, stops new matches, and pauses incoming messages while keeping your account data stored. Unlike deletion, deactivation is reversible and you can sign back in later to restore the same account. Use the Deactivate Account option in Account Settings if you want to step away without losing your history."
   }
 ]
