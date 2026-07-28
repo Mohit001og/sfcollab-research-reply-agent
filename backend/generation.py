@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+from pathlib import Path
 from typing import Any
 
 from dotenv import load_dotenv
@@ -19,7 +20,7 @@ except ImportError as exc:  # pragma: no cover - dependency issue is surfaced cl
 else:
     _GROQ_IMPORT_ERROR = None
 
-load_dotenv()
+load_dotenv(dotenv_path=Path(__file__).resolve().parent / ".env")
 
 
 class GenerationError(RuntimeError):

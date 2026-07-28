@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from retrieval import retrieve
+from backend.retrieval import retrieve
 
 
 TEST_QUERIES = [

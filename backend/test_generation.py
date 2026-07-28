@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from time import perf_counter
 
-from generation import GenerationError, generate_draft_reply
-from retrieval import retrieve
+from backend.generation import GenerationError, generate_draft_reply
+from backend.retrieval import retrieve
 
 
 TEST_CASES = [

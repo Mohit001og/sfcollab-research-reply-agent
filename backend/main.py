@@ -6,8 +6,8 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from generation import GenerationError, generate_draft_reply
-from retrieval import retrieve
+from backend.generation import GenerationError, generate_draft_reply
+from backend.retrieval import retrieve
 
 
 class AskRequest(BaseModel):

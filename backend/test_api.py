@@ -6,7 +6,7 @@ import json
 
 from fastapi.testclient import TestClient
 
-from main import app
+from backend.main import app
 
 
 TEST_CASES = [
@@ -14,6 +14,8 @@ TEST_CASES = [
     "What's the weather like today?",
     "How do I update my profile picture and will it show up immediately to people I've already matched with?",
 ]
+
+
 def run_case(client: TestClient, question: str) -> None:
     """Call the ask endpoint and print the full JSON response."""
     response = client.post("/api/ask", json={"question": question})
