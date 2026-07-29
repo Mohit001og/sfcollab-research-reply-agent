@@ -52,26 +52,13 @@ function App() {
     <main className="app-shell">
       <section className="hero-card">
         <div className="hero-copy">
-          <p className="eyebrow">Controlled two-step workflow</p>
           <h1>Two-Step Research & Draft Reply Agent</h1>
-          <p className="hero-subtitle">
-            Retrieve relevant knowledge, generate a grounded draft reply, and require human
-            approval before any action.
+          <p className="hero-summary">
+            Retrieves grounded evidence from the help center, drafts a reply from it, and
+            refuses to guess if nothing relevant is found. Nothing is sent without your
+            approval.
           </p>
         </div>
-
-        <div className="workflow-strip" aria-label="Workflow steps">
-          <span>Retrieve Evidence</span>
-          <span aria-hidden="true">→</span>
-          <span>Generate Draft Reply</span>
-          <span aria-hidden="true">→</span>
-          <span>Human Approval</span>
-        </div>
-
-        <p className="workflow-note">
-          Replies are generated only from retrieved knowledge-base evidence. If no relevant
-          evidence is found, the agent refuses instead of guessing.
-        </p>
 
         <div className="search-card">
           <label className="question-label" htmlFor="question">
