@@ -115,10 +115,7 @@ function App() {
               </div>
             ) : (
               <p className="empty-state">
-                No evidence retrieved yet.
-                <br />
-                <br />
-                Ask a support question to search the knowledge base.
+                No relevant help content found in the knowledge base for this question.
               </p>
             )
           ) : (
