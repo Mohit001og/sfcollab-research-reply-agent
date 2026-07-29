@@ -45,6 +45,14 @@ app.add_middleware(
 )
 
 
+@app.get("/")
+def root() -> dict[str, str]:
+    """Friendly root route for direct visits."""
+    return {
+        "message": "SFCollab Research Reply Agent API is running. See /api/health for status, or use the frontend to interact with this service."
+    }
+
+
 @app.get("/api/health")
 def health() -> dict[str, str]:
     """Basic health check."""
