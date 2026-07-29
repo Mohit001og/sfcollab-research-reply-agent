@@ -96,8 +96,12 @@ input:focus-visible {
 .hero-summary {
   margin: 12px 0 0;
   max-width: 74ch;
+  margin-inline: auto;
+  text-align: center;
   color: #475569;
   font-size: 1.02rem;
+  line-height: 1.6;
+  text-wrap: balance;
 }
 
 .search-card {
