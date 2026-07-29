@@ -206,6 +206,37 @@ input:focus-visible {
   align-items: start;
 }
 
+.how-this-works {
+  grid-column: 1 / -1;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 18px;
+  background: rgba(248, 250, 252, 0.84);
+  padding: 14px 16px;
+  color: #334155;
+}
+
+.how-this-works summary {
+  cursor: pointer;
+  font-weight: 800;
+  color: #0f172a;
+  list-style: none;
+}
+
+.how-this-works summary::-webkit-details-marker {
+  display: none;
+}
+
+.how-this-works-body {
+  margin-top: 12px;
+  display: grid;
+  gap: 10px;
+  font-size: 0.95rem;
+}
+
+.how-this-works-body p {
+  margin: 0;
+}
+
 .panel {
   padding: 22px;
   min-height: 100%;

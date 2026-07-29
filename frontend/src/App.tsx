@@ -165,6 +165,30 @@ function App() {
             </p>
           )}
         </article>
+
+        <details className="how-this-works">
+          <summary>How this works</summary>
+          <div className="how-this-works-body">
+            <p>
+              Retrieval uses TF-IDF text similarity, not semantic embeddings. That is
+              intentional for this small, static 32-snippet knowledge base.
+            </p>
+            <p>
+              The score shown on each snippet is out of 1.0. Snippets below the minimum
+              threshold are excluded entirely, which is why some questions return zero
+              results.
+            </p>
+            <p>
+              Approve does not send anything anywhere. There is no delivery destination in
+              this task; it only confirms that a human reviewed and accepted the draft.
+            </p>
+            <p>
+              The draft is generated only from the visible retrieved snippets above it. If a
+              claim is not supported by a snippet you can see, it should not appear in the
+              draft.
+            </p>
+          </div>
+        </details>
       </section>
     </main>
   )

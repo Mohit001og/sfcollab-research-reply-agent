@@ -30,6 +30,7 @@ class AskResponse(BaseModel):
 
     question: str
     retrieved_snippets: list[RetrievedSnippet]
+    source_ids: list[str]
     draft: str
     grounded: bool
 
@@ -65,6 +66,7 @@ def ask(payload: AskRequest) -> AskResponse:
     return AskResponse(
         question=payload.question,
         retrieved_snippets=[RetrievedSnippet(**snippet) for snippet in snippets],
+        source_ids=[snippet["id"] for snippet in snippets],
         draft=draft_result["draft"],
         grounded=draft_result["grounded"],
     )

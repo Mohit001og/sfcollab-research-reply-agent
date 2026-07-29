@@ -8,6 +8,7 @@ export type RetrievedSnippet = {
 export type AskResponse = {
   question: string
   retrieved_snippets: RetrievedSnippet[]
+  source_ids: string[]
   draft: string
   grounded: boolean
 }
