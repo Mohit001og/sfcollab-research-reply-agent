@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from time import perf_counter
 
 from backend.generation import GenerationError, generate_draft_reply
@@ -14,6 +15,8 @@ TEST_CASES = [
     "Can I use SFCollab if I'm not based in the US?",
     "How do I update my profile picture and will it show up immediately to people I've already matched with?",
 ]
+
+COMPOUND_QUESTION = "How do I update my profile picture and will it show up immediately to people I've already matched with?"
 
 
 def print_case(question: str) -> None:
@@ -42,8 +45,19 @@ def print_case(question: str) -> None:
     print()
 
 
+def assert_compound_case_is_grounded() -> None:
+    """Verify the validator allows a hedged partial answer through."""
+    retrieved = retrieve(COMPOUND_QUESTION)
+    result = generate_draft_reply(COMPOUND_QUESTION, retrieved)
+    assert retrieved, "Expected retrieval to return evidence for the compound question."
+    assert result["grounded"] is True, "Expected the partial-answer draft to remain grounded."
+    assert "I don't have enough information" not in result["draft"], "Expected an answer, not a refusal."
+
+
 def main() -> None:
     """Run all end-to-end generation checks."""
+    os.environ.setdefault("OFFLINE_TEST_MODE", "true")
+    assert_compound_case_is_grounded()
     for question in TEST_CASES:
         print_case(question)
 

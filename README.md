@@ -16,6 +16,73 @@ This repository contains a two-step support reply assistant for SFCollab.
 - `backend/`: FastAPI service, retrieval logic, and reply generation
 - `frontend/`: Vite + React UI and end-to-end tests
 
+## Fresh Clone Setup
+
+These steps assume a brand-new clone and no prior local environment.
+
+### 1. Set up the backend
+
+```powershell
+cd backend
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+Create a `backend/.env` file with your Groq API key:
+
+```powershell
+@"
+GROQ_API_KEY=your_groq_api_key_here
+"@ | Set-Content .env
+```
+
+Run the backend locally:
+
+```powershell
+python -m uvicorn backend.main:app --host 127.0.0.1 --port 8020
+```
+
+### 2. Set up the frontend
+
+Open a new terminal at the repository root and run:
+
+```powershell
+cd frontend
+npm install
+```
+
+Create `frontend/.env` so the UI knows where the backend is running:
+
+```powershell
+@"
+VITE_API_URL=http://127.0.0.1:8020
+"@ | Set-Content .env
+```
+
+Run the frontend locally:
+
+```powershell
+npm run dev -- --host 127.0.0.1 --port 5173
+```
+
+### 3. Run tests
+
+Backend checks:
+
+```powershell
+cd backend
+python -m pytest
+```
+
+Frontend end-to-end checks:
+
+```powershell
+cd frontend
+npm run e2e
+```
+
 ## Design Decisions
 
 ### Why TF-IDF instead of embeddings or a vector database?

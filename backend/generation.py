@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import re
 from pathlib import Path
 from typing import Any
 
@@ -32,6 +33,52 @@ _REFUSAL_TEXT = (
     "I don't have enough information in the help content to answer this confidently. "
     "Could you try rephrasing, or this may need a human to look into it."
 )
+_GROUNDING_STOP_WORDS = {
+    "about",
+    "after",
+    "also",
+    "answer",
+    "are",
+    "because",
+    "been",
+    "before",
+    "being",
+    "can",
+    "could",
+    "does",
+    "each",
+    "even",
+    "from",
+    "have",
+    "help",
+    "here",
+    "into",
+    "just",
+    "like",
+    "more",
+    "most",
+    "need",
+    "only",
+    "please",
+    "should",
+    "that",
+    "their",
+    "there",
+    "this",
+    "those",
+    "through",
+    "today",
+    "very",
+    "what",
+    "when",
+    "where",
+    "which",
+    "will",
+    "with",
+    "would",
+    "your",
+    "you",
+}
 
 
 def _format_context(retrieved_snippets: list[dict[str, Any]]) -> str:
@@ -42,6 +89,44 @@ def _format_context(retrieved_snippets: list[dict[str, Any]]) -> str:
             f"Title: {snippet['title']}\nContent: {snippet['content']}"
         )
     return "\n\n".join(blocks)
+
+
+def _tokenize(text: str) -> set[str]:
+    """Extract lightweight content words for grounding checks."""
+    tokens = set()
+    for token in re.findall(r"[A-Za-z][A-Za-z0-9'-]{2,}", text.lower()):
+        if token in _GROUNDING_STOP_WORDS:
+            continue
+        tokens.add(token)
+    return tokens
+
+
+def _build_snippet_token_set(retrieved_snippets: list[dict[str, Any]]) -> set[str]:
+    """Collect normalized tokens from the retrieved evidence."""
+    snippet_tokens: set[str] = set()
+    for snippet in retrieved_snippets:
+        snippet_tokens.update(_tokenize(snippet["title"]))
+        snippet_tokens.update(_tokenize(snippet["content"]))
+    return snippet_tokens
+
+
+def _is_grounded_draft(draft: str, retrieved_snippets: list[dict[str, Any]]) -> bool:
+    """Heuristically check whether the draft stays within retrieved evidence."""
+    if not draft.strip():
+        return False
+
+    if "I don't have enough information" in draft:
+        return True
+
+    draft_tokens = _tokenize(draft)
+    snippet_tokens = _build_snippet_token_set(retrieved_snippets)
+    if not draft_tokens or not snippet_tokens:
+        return False
+
+    overlap = draft_tokens & snippet_tokens
+    overlap_ratio = len(overlap) / len(draft_tokens)
+
+    return len(overlap) >= 4 or overlap_ratio >= 0.28
 
 
 def _build_local_draft(question: str, retrieved_snippets: list[dict[str, Any]]) -> str:
@@ -85,6 +170,8 @@ def generate_draft_reply(question: str, retrieved_snippets: list[dict[str, Any]]
     if not api_key:
         raise GenerationError("GROQ_API_KEY is not set in the environment.")
 
+    offline_test_mode = os.getenv("OFFLINE_TEST_MODE", "").lower() in {"1", "true", "yes"}
+
     context = _format_context(retrieved_snippets)
     prompt = (
         "You are a warm, helpful SFCollab support agent.\n"
@@ -108,8 +195,18 @@ def generate_draft_reply(question: str, retrieved_snippets: list[dict[str, Any]]
         )
         draft = response.choices[0].message.content or ""
         if draft.strip():
-            return {"draft": draft.strip(), "grounded": True}
-    except (AuthenticationError, RateLimitError, APIError, Exception):
-        pass
+            normalized_draft = draft.strip()
+            if _is_grounded_draft(normalized_draft, retrieved_snippets):
+                return {"draft": normalized_draft, "grounded": True}
+            if offline_test_mode:
+                return {"draft": _build_local_draft(question, retrieved_snippets), "grounded": True}
+            return {"draft": _REFUSAL_TEXT, "grounded": False}
+    except (AuthenticationError, RateLimitError, APIError, Exception) as exc:
+        if offline_test_mode:
+            return {"draft": _build_local_draft(question, retrieved_snippets), "grounded": True}
+        raise GenerationError(f"Failed to generate draft reply via Groq: {exc}") from exc
 
-    return {"draft": _build_local_draft(question, retrieved_snippets), "grounded": True}
+    if offline_test_mode:
+        return {"draft": _build_local_draft(question, retrieved_snippets), "grounded": True}
+
+    raise GenerationError("Failed to generate draft reply via Groq: empty response.")

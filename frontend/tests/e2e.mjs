@@ -16,7 +16,10 @@ function startProcess(command, args, cwd) {
     cwd,
     shell: true,
     stdio: ['ignore', 'pipe', 'pipe'],
-    env: process.env,
+    env: {
+      ...process.env,
+      OFFLINE_TEST_MODE: 'true',
+    },
   })
   proc.stdout.on('data', (chunk) => process.stdout.write(chunk))
   proc.stderr.on('data', (chunk) => process.stderr.write(chunk))
@@ -86,7 +89,7 @@ async function main() {
 
     const openFrontend = async () => {
       await page.goto('http://127.0.0.1:5173', { waitUntil: 'networkidle' })
-      await assert(page.getByRole('heading', { name: 'SFCollab Research Reply Agent' }).isVisible(), 'frontend shell renders')
+      await assert(page.getByRole('heading', { name: 'Two-Step Research & Draft Reply Agent' }).isVisible(), 'frontend shell renders')
     }
 
     await openFrontend()
