@@ -16,6 +16,12 @@ This repository contains a two-step support reply assistant for SFCollab.
 - `backend/`: FastAPI service, retrieval logic, and reply generation
 - `frontend/`: Vite + React UI and end-to-end tests
 
+## Live Deployment
+
+- **Frontend:** https://sfcollab-research-reply-agent-git-main-semantic-search.vercel.app
+- **Backend:** https://sfcollab-research-reply-agent.onrender.com
+- **Health check:** https://sfcollab-research-reply-agent.onrender.com/api/health
+
 ## Fresh Clone Setup
 
 These steps assume a brand-new clone and no prior local environment.
@@ -23,16 +29,17 @@ These steps assume a brand-new clone and no prior local environment.
 ### 1. Set up the backend
 
 ```powershell
-cd backend
 python -m venv .venv
-.venv\Scripts\Activate.ps1
+.\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
+cd backend
 pip install -r requirements.txt
 ```
 
-Create a `backend/.env` file with your Groq API key:
+Create a `backend/.env` file with your Groq API key from the repository root:
 
 ```powershell
+cd backend
 @"
 GROQ_API_KEY=your_groq_api_key_here
 "@ | Set-Content .env
@@ -41,6 +48,7 @@ GROQ_API_KEY=your_groq_api_key_here
 Run the backend locally:
 
 ```powershell
+cd ..
 python -m uvicorn backend.main:app --host 127.0.0.1 --port 8020
 ```
 
@@ -69,11 +77,12 @@ npm run dev -- --host 127.0.0.1 --port 5173
 
 ### 3. Run tests
 
-Backend checks:
+Backend checks from the repository root:
 
 ```powershell
-cd backend
-python -m pytest
+python -m backend.test_retrieval
+python -m backend.test_api
+python -m backend.test_generation
 ```
 
 Frontend end-to-end checks:
