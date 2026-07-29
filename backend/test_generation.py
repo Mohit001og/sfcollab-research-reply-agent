@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import os
 from time import perf_counter
 
 from backend.generation import GenerationError, generate_draft_reply
@@ -56,7 +55,6 @@ def assert_compound_case_is_grounded() -> None:
 
 def main() -> None:
     """Run all end-to-end generation checks."""
-    os.environ.setdefault("OFFLINE_TEST_MODE", "true")
     assert_compound_case_is_grounded()
     for question in TEST_CASES:
         print_case(question)

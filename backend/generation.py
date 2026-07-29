@@ -118,6 +118,9 @@ def _is_grounded_draft(draft: str, retrieved_snippets: list[dict[str, Any]]) -> 
     if "I don't have enough information" in draft:
         return True
 
+    if "could you try rephrasing" in draft.lower() or "may need a human to look into it" in draft.lower():
+        return True
+
     draft_tokens = _tokenize(draft)
     snippet_tokens = _build_snippet_token_set(retrieved_snippets)
     if not draft_tokens or not snippet_tokens:
@@ -198,8 +201,6 @@ def generate_draft_reply(question: str, retrieved_snippets: list[dict[str, Any]]
             normalized_draft = draft.strip()
             if _is_grounded_draft(normalized_draft, retrieved_snippets):
                 return {"draft": normalized_draft, "grounded": True}
-            if offline_test_mode:
-                return {"draft": _build_local_draft(question, retrieved_snippets), "grounded": True}
             return {"draft": _REFUSAL_TEXT, "grounded": False}
     except (AuthenticationError, RateLimitError, APIError, Exception) as exc:
         if offline_test_mode:
