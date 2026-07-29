@@ -1,17 +1,22 @@
 # sfcollab-research-reply-agent
 
-This project is a two-step grounded research + draft-reply agent for SFCollab, a startup co-founder matchmaking platform.
+This repository contains a two-step support reply assistant for SFCollab.
 
-The first step retrieves the most relevant help-center snippets from a local knowledge base using TF-IDF. The next phase will use those grounded snippets to draft a reply, but this repository intentionally stops short of sending anything automatically.
+## Architecture
 
-## Local Setup
+- The backend retrieves relevant help-center content from a local knowledge base using TF-IDF.
+- It then uses Groq to draft a reply from the retrieved evidence.
+- The frontend shows a two-panel UI:
+  - Retrieved Evidence
+  - Draft Reply
+- The app requires human approval before any reply is treated as sent.
 
-This repo currently contains the knowledge base and retrieval layer only.
+## Repository Layout
 
-1. Set up the backend environment and install dependencies from `backend/requirements.txt`.
-2. Configure `backend/.env` from `backend/.env.example` when you are ready to add API keys.
-3. Install frontend dependencies in `frontend/` after scaffolding.
+- `backend/`: FastAPI service, retrieval logic, and reply generation
+- `frontend/`: Vite + React UI and end-to-end tests
 
-## Approval Note
+## Notes
 
-This project deliberately does not auto-send anything. Human approval is required at every step before any reply is sent or any action is taken on behalf of a user.
+- The assistant refuses to guess when retrieval finds no relevant evidence.
+- The UI keeps evidence and draft output separate so the review step stays explicit.

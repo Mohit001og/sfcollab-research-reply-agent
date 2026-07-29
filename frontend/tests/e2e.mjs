@@ -96,8 +96,8 @@ async function main() {
     const askResponse1 = page.waitForResponse((response) => response.url().includes('/api/ask') && response.request().method() === 'POST')
     await page.getByRole('button', { name: 'Ask' }).click()
     await askResponse1
-    await page.getByText('Retrieved Evidence').waitFor({ state: 'visible' })
-    await page.getByText('Draft Reply').waitFor({ state: 'visible' })
+    await page.getByTestId('evidence-panel').getByRole('heading', { name: 'Retrieved Evidence' }).waitFor({ state: 'visible' })
+    await page.getByTestId('draft-panel').getByRole('heading', { name: 'Draft Reply' }).waitFor({ state: 'visible' })
     await page.screenshot({ path: resolve(screenshotsDir, 'test1_results.png'), fullPage: true })
 
     const snippetCards = page.locator('.snippet')
@@ -125,7 +125,7 @@ async function main() {
     await page.getByRole('button', { name: 'Ask' }).click()
     await askResponse2
     await page.screenshot({ path: resolve(screenshotsDir, 'test2_results.png'), fullPage: true })
-    await assert(await page.getByText('No relevant help content found for this question.').isVisible(), 'no-match evidence message is shown')
+    await assert(await page.getByText('No relevant help content found in the knowledge base for this question.').isVisible(), 'no-match evidence message is shown')
     await assert(await page.getByText(/I don'?t have enough information in the help content to answer this confidently\./).isVisible(), 'no-match refusal text is shown')
     await assert(await page.locator('[data-testid="draft-panel"]').evaluate((el) => el.classList.contains('ungrounded')), 'no-match draft panel is marked ungrounded')
 
@@ -138,7 +138,7 @@ async function main() {
     const priorApiCalls = apiCalls.length
     await page.getByRole('button', { name: 'Approve' }).click()
     await page.screenshot({ path: resolve(screenshotsDir, 'test3_approved.png'), fullPage: true })
-    await assert(await page.getByText('Approved (not sent — no delivery destination in this task)').isVisible(), 'approval confirmation appears')
+    await assert(await page.getByText('Approved (not sent - no delivery destination in this task)').isVisible(), 'approval confirmation appears')
     await assert(apiCalls.length === priorApiCalls, 'approve flow does not trigger any extra network request')
 
     console.log('All assertions passed.')

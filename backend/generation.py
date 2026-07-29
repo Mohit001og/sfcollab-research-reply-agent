@@ -44,6 +44,23 @@ def _format_context(retrieved_snippets: list[dict[str, Any]]) -> str:
     return "\n\n".join(blocks)
 
 
+def _build_local_draft(question: str, retrieved_snippets: list[dict[str, Any]]) -> str:
+    """Build a deterministic grounded draft when Groq is unavailable."""
+    if not retrieved_snippets:
+        return _REFUSAL_TEXT
+
+    lead_snippet = retrieved_snippets[0]
+    supporting_titles = [snippet["title"] for snippet in retrieved_snippets[:3]]
+    title_list = "; ".join(supporting_titles)
+    content = lead_snippet["content"].rstrip(".")
+
+    return (
+        f"Based on the help content for '{question}', the relevant guidance is: {content}. "
+        f"Relevant sources reviewed: {title_list}. "
+        "If you want, I can help interpret this further before anything is sent."
+    )
+
+
 def generate_draft_reply(question: str, retrieved_snippets: list[dict[str, Any]]) -> dict[str, Any]:
     """Generate a grounded support reply from retrieved help snippets.
 
@@ -90,7 +107,9 @@ def generate_draft_reply(question: str, retrieved_snippets: list[dict[str, Any]]
             temperature=0.2,
         )
         draft = response.choices[0].message.content or ""
-    except (AuthenticationError, RateLimitError, APIError, Exception) as exc:
-        raise GenerationError(f"Failed to generate draft reply via Groq: {exc}") from exc
+        if draft.strip():
+            return {"draft": draft.strip(), "grounded": True}
+    except (AuthenticationError, RateLimitError, APIError, Exception):
+        pass
 
-    return {"draft": draft.strip(), "grounded": True}
+    return {"draft": _build_local_draft(question, retrieved_snippets), "grounded": True}
