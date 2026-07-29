@@ -80,6 +80,17 @@ input:focus-visible {
   font-size: clamp(2rem, 3vw, 3.1rem);
   line-height: 1.02;
   letter-spacing: -0.05em;
+  color: #0f172a;
+}
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .hero-copy h1 {
+    background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 55%, #0f172a 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
 }
 
 .eyebrow {
