@@ -2,12 +2,16 @@
 
 from __future__ import annotations
 
+import resource
+from time import perf_counter
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from backend.generation import GenerationError, generate_draft_reply
 from backend.retrieval import retrieve
+from backend.retrieval_chroma import _build_collection, load_embedder, retrieve as retrieve_chroma
 
 
 class AskRequest(BaseModel):
@@ -57,6 +61,25 @@ def root() -> dict[str, str]:
 def health() -> dict[str, str]:
     """Basic health check."""
     return {"status": "ok"}
+
+
+@app.get("/debug/chroma-memory-test")
+def chroma_memory_test() -> dict[str, object]:
+    # TEMPORARY - DIAGNOSTIC ONLY - REMOVE BEFORE MERGE
+    memory_before_mb = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
+    started = perf_counter()
+    load_embedder()
+    _build_collection()
+    sample_query_result = retrieve_chroma("How do I update my profile picture?")
+    elapsed_seconds = perf_counter() - started
+    memory_after_mb = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
+    return {
+        "memory_before_mb": memory_before_mb,
+        "memory_after_mb": memory_after_mb,
+        "memory_delta_mb": memory_after_mb - memory_before_mb,
+        "sample_query_result": sample_query_result,
+        "elapsed_seconds": elapsed_seconds,
+    }
 
 
 @app.post("/api/ask", response_model=AskResponse)

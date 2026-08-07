@@ -4,3 +4,5 @@ scikit-learn
 python-dotenv
 groq
 pydantic
+chromadb
+fastembed

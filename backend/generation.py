@@ -170,8 +170,10 @@ def generate_draft_reply(question: str, retrieved_snippets: list[dict[str, Any]]
         raise GenerationError(f"Groq SDK is unavailable: {_GROQ_IMPORT_ERROR}")
 
     api_key = os.getenv("GROQ_API_KEY")
-    if not api_key:
+    if not api_key and not offline_test_mode:
         raise GenerationError("GROQ_API_KEY is not set in the environment.")
+    if not api_key and offline_test_mode:
+        api_key = "offline-test-mode"
 
     offline_test_mode = os.getenv("OFFLINE_TEST_MODE", "").lower() in {"1", "true", "yes"}
 
