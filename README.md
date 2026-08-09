@@ -4,7 +4,7 @@ This repository contains a two-step support reply assistant for SFCollab.
 
 ## Architecture
 
-- The backend retrieves relevant help-center content from a local knowledge base using TF-IDF.
+- The backend retrieves relevant help-center content from a knowledge base using Pinecone's integrated-inference vector search.
 - It then uses Groq to draft a reply from the retrieved evidence.
 - The frontend shows a two-panel UI:
   - Retrieved Evidence
@@ -94,9 +94,13 @@ npm run e2e
 
 ## Design Decisions
 
-### Why TF-IDF instead of embeddings or a vector database?
+### Why Pinecone instead of local embeddings or TF-IDF?
 
-This project uses TF-IDF because the knowledge base is small and static at 32 snippets. TF-IDF is easy to inspect, cheap to run, and does not add an extra paid dependency or infrastructure layer just to retrieve a few dozen help articles. For this scale, it is a deliberate simplicity choice, not a limitation.
+The project started with TF-IDF for the same reasons noted below - it's simple, cheap, and sufficient for 32 static snippets. When asked to move to a RAG approach with a local vector database, we first tried ChromaDB with a local fastembed embedding model (BAAI/bge-small-en-v1.5, ONNX-based to avoid a PyTorch dependency). Real memory testing on Render's free tier showed this approach used 488MB of the platform's 512MB limit on a single cold request with no concurrent traffic - too close to the ceiling to be safe under real usage, and cold starts took ~46 seconds due to the embedding model downloading at boot.
+
+We switched to Pinecone with integrated inference instead. Pinecone generates and stores embeddings on its own infrastructure, so the backend never loads an embedding model locally. The same memory diagnostic run against Pinecone showed a ~9-19MB memory delta and ~2-3 second response times - both dramatically better than the local-embedding approach, while keeping retrieval quality equal or better (embedding-based search is more resilient to typos and paraphrasing than TF-IDF was).
+
+The refusal threshold (min_score) was empirically tuned by testing real on-topic, borderline, and off-topic queries against the deployed model rather than picked arbitrarily - see scripts/test_pinecone_retrieval.py for the test set used to find the score gap between relevant and irrelevant matches.
 
 ### Why Groq for generation?
 
