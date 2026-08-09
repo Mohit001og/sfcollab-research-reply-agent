@@ -58,7 +58,9 @@ def _prime_index() -> None:
     load_knowledge_base()
 
 
-def retrieve(query: str, top_k: int = 3, min_score: float = 0.1) -> list[dict[str, Any]]:
+# This threshold was tuned from observed score separation in testing, not set
+# arbitrarily; revisit it as we collect more real production queries over time.
+def retrieve(query: str, top_k: int = 3, min_score: float = 0.79) -> list[dict[str, Any]]:
     """Return the most relevant help snippets for a query.
 
     Matches the return shape of backend.retrieval.retrieve and
@@ -77,22 +79,21 @@ def retrieve(query: str, top_k: int = 3, min_score: float = 0.1) -> list[dict[st
             "inputs": {"text": query},
             "top_k": top_k,
         },
-        fields=["id", "title", "content"],
+        fields=["title", "content"],
     )
 
-    hits = result.get("result", {}).get("hits", [])
+    hits = result.result.hits
     matches: list[dict[str, Any]] = []
     for hit in hits:
-        score = float(hit.get("_score", 0.0))
+        score = float(hit.score)
         if score <= min_score:
             continue
 
-        fields = hit.get("fields", {})
         matches.append(
             {
-                "id": fields.get("id") or hit.get("_id"),
-                "title": fields.get("title", ""),
-                "content": fields.get("content", ""),
+                "id": hit.id,
+                "title": hit.fields.get("title", ""),
+                "content": hit.fields.get("content", ""),
                 "score": round(score, 3),
             }
         )
