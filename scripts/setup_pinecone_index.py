@@ -28,9 +28,10 @@ def main() -> None:
 
     pc = Pinecone(api_key=api_key)
 
+    index_list = pc.list_indexes()
     index_exists = any(
-        index_info.get("name") == PINECONE_INDEX_NAME
-        for index_info in pc.list_indexes()
+        getattr(index_info, "name", None) == PINECONE_INDEX_NAME
+        for index_info in index_list
     )
 
     if not index_exists:
@@ -44,26 +45,29 @@ def main() -> None:
             },
         )
 
-        timeout_seconds = 120
-        poll_interval_seconds = 2
-        deadline = time.time() + timeout_seconds
+    timeout_seconds = 120
+    poll_interval_seconds = 2
+    deadline = time.time() + timeout_seconds
 
-        while True:
-            index_info = next(
-                (
-                    item
-                    for item in pc.list_indexes()
-                    if item.get("name") == PINECONE_INDEX_NAME
-                ),
-                None,
+    while True:
+        index_list = pc.list_indexes()
+        index_info = next(
+            (
+                item
+                for item in index_list
+                if getattr(item, "name", None) == PINECONE_INDEX_NAME
+            ),
+            None,
+        )
+        status = getattr(index_info, "status", None) if index_info is not None else None
+        is_ready = bool(getattr(status, "ready", False)) if status is not None else False
+        if index_info is not None and is_ready:
+            break
+        if time.time() >= deadline:
+            raise TimeoutError(
+                f"Timed out waiting for Pinecone index {PINECONE_INDEX_NAME!r} to become ready"
             )
-            if index_info and index_info.get("status", {}).get("ready"):
-                break
-            if time.time() >= deadline:
-                raise TimeoutError(
-                    f"Timed out waiting for Pinecone index {PINECONE_INDEX_NAME!r} to become ready"
-                )
-            time.sleep(poll_interval_seconds)
+        time.sleep(poll_interval_seconds)
 
     index = pc.Index(PINECONE_INDEX_NAME)
 

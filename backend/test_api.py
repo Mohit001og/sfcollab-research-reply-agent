@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import json
 
 from fastapi.testclient import TestClient
@@ -28,6 +29,7 @@ def run_case(client: TestClient, question: str) -> None:
 
 def main() -> None:
     """Run the endpoint checks in-process."""
+    os.environ.setdefault("OFFLINE_TEST_MODE", "true")
     with TestClient(app) as client:
         for question in TEST_CASES:
             run_case(client, question)
