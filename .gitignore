@@ -9,3 +9,5 @@ __pycache__/
 node_modules/
 dist/
 .env
+diagnostic_result.json
+pinecone_diagnostic_result.json
