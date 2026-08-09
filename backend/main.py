@@ -86,8 +86,12 @@ def pinecone_memory_test() -> dict[str, object]:
     import resource
     from time import perf_counter
 
+    from backend.retrieval_pinecone import PINECONE_INDEX_NAME, PINECONE_NAMESPACE
     from backend.retrieval_pinecone import retrieve
 
+    print(
+        f"DEBUG PINECONE SETTINGS: index={PINECONE_INDEX_NAME!r} namespace={PINECONE_NAMESPACE!r}"
+    )
     memory_before_mb = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
     started = perf_counter()
     sample_query_result = retrieve("How do I update my profile picture?")
@@ -99,4 +103,6 @@ def pinecone_memory_test() -> dict[str, object]:
         "memory_delta_mb": memory_after_mb - memory_before_mb,
         "sample_query_result": sample_query_result,
         "elapsed_seconds": elapsed_seconds,
+        "debug_index_name": PINECONE_INDEX_NAME,
+        "debug_namespace": PINECONE_NAMESPACE,
     }
