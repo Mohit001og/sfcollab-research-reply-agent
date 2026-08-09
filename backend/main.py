@@ -78,3 +78,25 @@ def ask(payload: AskRequest) -> AskResponse:
         draft=draft_result["draft"],
         grounded=draft_result["grounded"],
     )
+
+
+@app.get("/debug/pinecone-memory-test")
+def pinecone_memory_test() -> dict[str, object]:
+    # TEMPORARY - DIAGNOSTIC ONLY - REMOVE BEFORE MERGE
+    import resource
+    from time import perf_counter
+
+    from backend.retrieval_pinecone import retrieve
+
+    memory_before_mb = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
+    started = perf_counter()
+    sample_query_result = retrieve("How do I update my profile picture?")
+    elapsed_seconds = perf_counter() - started
+    memory_after_mb = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
+    return {
+        "memory_before_mb": memory_before_mb,
+        "memory_after_mb": memory_after_mb,
+        "memory_delta_mb": memory_after_mb - memory_before_mb,
+        "sample_query_result": sample_query_result,
+        "elapsed_seconds": elapsed_seconds,
+    }
