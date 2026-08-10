@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+import asyncpg
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from backend.generation import GenerationError, generate_draft_reply
+from backend.feedback import get_feedback_summary, init_feedback_table, submit_feedback
 from backend.retrieval_pinecone import retrieve
 
 
@@ -35,6 +38,15 @@ class AskResponse(BaseModel):
     grounded: bool
 
 
+class FeedbackRequest(BaseModel):
+    """Request body for feedback on a generated draft."""
+
+    question: str = Field(..., min_length=1)
+    draft: str = Field(..., min_length=1)
+    source_ids: list[str] = Field(default_factory=list)
+    rating: str = Field(..., pattern="^(up|down)$")
+
+
 app = FastAPI(title="sfcollab-research-reply-agent")
 app.add_middleware(
     CORSMiddleware,
@@ -43,6 +55,15 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.on_event("startup")
+async def startup() -> None:
+    """Initialize the feedback table on app startup."""
+    try:
+        await init_feedback_table()
+    except Exception as exc:
+        print(f"WARNING: Failed to initialize feedback storage on startup: {exc}")
 
 
 @app.get("/")
@@ -78,3 +99,33 @@ def ask(payload: AskRequest) -> AskResponse:
         draft=draft_result["draft"],
         grounded=draft_result["grounded"],
     )
+
+
+@app.post("/api/feedback")
+async def feedback(payload: FeedbackRequest) -> dict[str, str]:
+    """Record feedback on a draft reply."""
+    try:
+        await submit_feedback(
+            question=payload.question,
+            draft=payload.draft,
+            source_ids=payload.source_ids,
+            rating=payload.rating,
+        )
+    except (RuntimeError, ConnectionError, OSError, asyncpg.PostgresError) as exc:
+        raise HTTPException(
+            status_code=503,
+            detail={"error": "Feedback database is unavailable.", "message": str(exc)},
+        ) from exc
+    return {"status": "recorded"}
+
+
+@app.get("/api/feedback/summary")
+async def feedback_summary() -> dict[str, object]:
+    """Return aggregate feedback counts."""
+    try:
+        return await get_feedback_summary()
+    except (RuntimeError, ConnectionError, OSError, asyncpg.PostgresError) as exc:
+        raise HTTPException(
+            status_code=503,
+            detail={"error": "Feedback database is unavailable.", "message": str(exc)},
+        ) from exc
