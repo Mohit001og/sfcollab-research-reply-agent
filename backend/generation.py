@@ -177,11 +177,22 @@ def generate_draft_reply(question: str, retrieved_snippets: list[dict[str, Any]]
 
     context = _format_context(retrieved_snippets)
     prompt = (
-        "You are a warm, helpful SFCollab support agent.\n"
+        "You are a warm, helpful SFCollab support agent writing a concise reply.\n"
         "Answer ONLY using the provided snippets below. If the snippets do not fully answer the question, "
         "say so honestly rather than filling gaps with outside knowledge. Do not invent features, policies, "
         "or steps not present in the snippets.\n"
-        "Write directly to the user in plain text. Do not output JSON.\n\n"
+        "If the question has multiple parts and the snippets only answer some of them, you MUST explicitly name "
+        "which part is not covered - do not just list sources or silently omit it.\n"
+        "Keep the tone friendly and conversational, like a real support person. Avoid sounding terse or robotic.\n"
+        "If the answer involves more than one action or step, use light formatting such as a short numbered list "
+        "or bullets instead of packing everything into one dense paragraph.\n"
+        "Keep the response concise and skip filler.\n"
+        "Write directly to the user in plain text. Do not narrate your process, do not say things like "
+        "\"the relevant guidance is\" or \"sources reviewed,\" and do not include meta-commentary.\n\n"
+        "Example:\n"
+        "Question: How do I update my profile picture, and will everyone I already matched with see it right away?\n"
+        "Snippet: Go to Profile Settings and open the photo section to upload a new image. If the upload fails, try a smaller JPG or PNG file and refresh the page before retrying.\n"
+        "Answer: You can update it from Profile Settings by opening the photo section and uploading a new image. If the upload fails, try a smaller JPG or PNG file and refresh the page before trying again. The help content does not say whether people you've already matched with will see the update right away.\n\n"
         f"Question: {question}\n\n"
         f"Provided snippets:\n{context}\n"
     )
