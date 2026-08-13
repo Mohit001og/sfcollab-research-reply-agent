@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import './styles.css'
-import { askQuestion, type AskResponse } from './api/client'
+import { askQuestion, submitFeedback, type AskResponse, type FeedbackRating } from './api/client'
 
 function App() {
   const [question, setQuestion] = useState('')
@@ -8,8 +8,41 @@ function App() {
   const [result, setResult] = useState<AskResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [approvalMessage, setApprovalMessage] = useState('')
+  const [feedbackSelection, setFeedbackSelection] = useState<FeedbackRating | null>(null)
+  const [feedbackLocked, setFeedbackLocked] = useState(false)
+  const [feedbackError, setFeedbackError] = useState<string | null>(null)
+  const feedbackErrorTimer = useRef<number | null>(null)
 
   const hasResult = result !== null
+
+  useEffect(() => {
+    return () => {
+      if (feedbackErrorTimer.current !== null) {
+        window.clearTimeout(feedbackErrorTimer.current)
+      }
+    }
+  }, [])
+
+  function resetFeedbackState() {
+    if (feedbackErrorTimer.current !== null) {
+      window.clearTimeout(feedbackErrorTimer.current)
+      feedbackErrorTimer.current = null
+    }
+    setFeedbackSelection(null)
+    setFeedbackLocked(false)
+    setFeedbackError(null)
+  }
+
+  function showFeedbackError(message: string) {
+    if (feedbackErrorTimer.current !== null) {
+      window.clearTimeout(feedbackErrorTimer.current)
+    }
+    setFeedbackError(message)
+    feedbackErrorTimer.current = window.setTimeout(() => {
+      setFeedbackError(null)
+      feedbackErrorTimer.current = null
+    }, 4500)
+  }
 
   async function handleAsk() {
     const trimmedQuestion = question.trim()
@@ -20,6 +53,7 @@ function App() {
     setLoading(true)
     setError(null)
     setApprovalMessage('')
+    resetFeedbackState()
 
     try {
       const response = await askQuestion(trimmedQuestion)
@@ -41,11 +75,37 @@ function App() {
     setResult(null)
     setError(null)
     setApprovalMessage('')
+    resetFeedbackState()
     setLoading(false)
   }
 
   function handleApprove() {
     setApprovalMessage('Approved (not sent - no delivery destination in this task)')
+  }
+
+  async function handleFeedback(rating: FeedbackRating) {
+    if (!result || feedbackLocked) {
+      return
+    }
+
+    setFeedbackSelection(rating)
+    setFeedbackLocked(true)
+    setFeedbackError(null)
+
+    try {
+      await submitFeedback({
+        question: result.question,
+        draft: result.draft,
+        source_ids: result.source_ids,
+        rating,
+      })
+    } catch (cause) {
+      setFeedbackSelection(null)
+      setFeedbackLocked(false)
+      showFeedbackError(
+        cause instanceof Error ? cause.message : 'Unable to submit feedback right now.',
+      )
+    }
   }
 
   return (
@@ -147,6 +207,31 @@ function App() {
             <>
               {!result.grounded ? <div className="refusal-badge">Ungrounded / refusal</div> : null}
               <p className="draft-text">{result.draft}</p>
+              <div className="feedback-row" aria-label="Draft feedback controls">
+                <button
+                  type="button"
+                  className={`feedback-button thumbs-up${feedbackSelection === 'up' ? ' selected' : ''}`}
+                  onClick={() => handleFeedback('up')}
+                  disabled={feedbackLocked}
+                  aria-pressed={feedbackSelection === 'up'}
+                >
+                  Thumbs up
+                </button>
+                <button
+                  type="button"
+                  className={`feedback-button thumbs-down${feedbackSelection === 'down' ? ' selected' : ''}`}
+                  onClick={() => handleFeedback('down')}
+                  disabled={feedbackLocked}
+                  aria-pressed={feedbackSelection === 'down'}
+                >
+                  Thumbs down
+                </button>
+              </div>
+              {feedbackError ? (
+                <p className="inline-feedback-error" role="status" aria-live="polite">
+                  {feedbackError}
+                </p>
+              ) : null}
               <div className="action-row">
                 <button type="button" onClick={handleApprove}>
                   Approve

@@ -274,7 +274,8 @@ input:focus-visible {
 }
 
 .snippet-list,
-.action-row {
+.action-row,
+.feedback-row {
   display: grid;
   gap: 12px;
 }
@@ -335,6 +336,44 @@ input:focus-visible {
   color: #0f172a;
   font-size: 0.98rem;
   white-space: pre-wrap;
+}
+
+.feedback-row {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 18px;
+}
+
+.feedback-row button {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  border-radius: 14px;
+  background: #fff;
+  color: #0f172a;
+  font-weight: 800;
+}
+
+.feedback-row button.selected {
+  border-color: rgba(37, 99, 235, 0.5);
+  background: rgba(37, 99, 235, 0.12);
+  color: #1d4ed8;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+}
+
+.feedback-row button:disabled {
+  opacity: 0.84;
+  cursor: wait;
+  box-shadow: none;
+}
+
+.inline-feedback-error {
+  margin: 10px 0 0;
+  padding: 9px 12px;
+  border-radius: 12px;
+  background: rgba(254, 242, 242, 0.92);
+  border: 1px solid rgba(239, 68, 68, 0.22);
+  color: #b91c1c;
+  font-size: 0.9rem;
 }
 
 .draft-panel.ungrounded {
@@ -463,6 +502,10 @@ input:focus-visible {
   }
 
   .action-row {
+    grid-template-columns: 1fr;
+  }
+
+  .feedback-row {
     grid-template-columns: 1fr;
   }
 
