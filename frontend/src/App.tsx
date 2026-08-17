@@ -251,12 +251,13 @@ function App() {
           )}
         </article>
 
-        <details className="how-this-works">
+          <details className="how-this-works">
           <summary>How this works</summary>
           <div className="how-this-works-body">
             <p>
-              Retrieval uses TF-IDF text similarity, not semantic embeddings. That is
-              intentional for this small, static 32-snippet knowledge base.
+              Retrieval uses Pinecone semantic search with integrated inference, not a
+              local embedding model. That keeps the knowledge base lookup grounded while
+              staying lightweight for this small, static 32-snippet knowledge base.
             </p>
             <p>
               The score shown on each snippet is out of 1.0. Snippets below the minimum
