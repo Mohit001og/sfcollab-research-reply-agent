@@ -110,6 +110,41 @@ def _build_snippet_token_set(retrieved_snippets: list[dict[str, Any]]) -> set[st
     return snippet_tokens
 
 
+def _has_generic_greeting(draft: str) -> bool:
+    """Detect obvious conversational filler that is not a grounded answer."""
+    lowered = draft.lower()
+    return any(
+        phrase in lowered
+        for phrase in (
+            "hi there",
+            "hello",
+            "how can i help you today",
+            "what do you need assistance with",
+            "feel free to let me know",
+        )
+    )
+
+
+def _has_generic_clarification_request(draft: str) -> bool:
+    """Detect drafts that only ask the user to rephrase or add details."""
+    lowered = draft.lower()
+    return any(
+        phrase in lowered
+        for phrase in (
+            "please provide the question you need help with",
+            "can you provide the question",
+            "can you share more details",
+            "how can i help",
+            "what can i help you with",
+            "please let me know what you need help with",
+            "let me know what you need help with",
+            "please share more details",
+            "could you share more details",
+            "can you give me more details",
+        )
+    )
+
+
 def _is_grounded_draft(draft: str, retrieved_snippets: list[dict[str, Any]]) -> bool:
     """Heuristically check whether the draft stays within retrieved evidence."""
     if not draft.strip():
@@ -121,6 +156,9 @@ def _is_grounded_draft(draft: str, retrieved_snippets: list[dict[str, Any]]) -> 
     if "could you try rephrasing" in draft.lower() or "may need a human to look into it" in draft.lower():
         return True
 
+    if _has_generic_greeting(draft) or _has_generic_clarification_request(draft):
+        return False
+
     draft_tokens = _tokenize(draft)
     snippet_tokens = _build_snippet_token_set(retrieved_snippets)
     if not draft_tokens or not snippet_tokens:
@@ -129,7 +167,10 @@ def _is_grounded_draft(draft: str, retrieved_snippets: list[dict[str, Any]]) -> 
     overlap = draft_tokens & snippet_tokens
     overlap_ratio = len(overlap) / len(draft_tokens)
 
-    return len(overlap) >= 4 or overlap_ratio >= 0.28
+    if len(overlap) < 4 and overlap_ratio < 0.28:
+        return False
+
+    return True
 
 
 def _build_local_draft(question: str, retrieved_snippets: list[dict[str, Any]]) -> str:
@@ -146,6 +187,23 @@ def _build_local_draft(question: str, retrieved_snippets: list[dict[str, Any]]) 
         f"Based on the help content for '{question}', the relevant guidance is: {content}. "
         f"Relevant sources reviewed: {title_list}. "
         "If you want, I can help interpret this further before anything is sent."
+    )
+
+
+def _build_retry_prompt(question: str, retrieved_snippets: list[dict[str, Any]]) -> str:
+    """Build a stricter correction prompt when the first draft is non-answer filler."""
+    context = _format_context(retrieved_snippets)
+    return (
+        "The previous draft was not acceptable because it did not answer the user's question.\n"
+        "Rewrite it now using only the provided evidence.\n"
+        "You must answer the user's question directly.\n"
+        "Do not greet the user.\n"
+        "Do not ask for more details, clarification, or a rephrased question.\n"
+        "Do not say 'How can I help?' or any equivalent filler.\n"
+        "If the evidence contains the answer, provide the answer plainly and concisely.\n"
+        "If the evidence still does not fully answer, say so honestly.\n\n"
+        f"Question: {question}\n\n"
+        f"Provided snippets:\n{context}\n"
     )
 
 
@@ -179,17 +237,20 @@ def generate_draft_reply(question: str, retrieved_snippets: list[dict[str, Any]]
     context = _format_context(retrieved_snippets)
     prompt = (
         "You are a warm, helpful SFCollab support agent writing a concise reply.\n"
-        "Answer ONLY using the provided snippets below. If the snippets do not fully answer the question, "
-        "say so honestly rather than filling gaps with outside knowledge. Do not invent features, policies, "
-        "or steps not present in the snippets.\n"
+        "Answer the user's question directly and only use the provided snippets as factual evidence.\n"
+        "If the snippets contain the answer, state that answer plainly in your first sentence and keep going only if needed.\n"
+        "When the question is clear and the snippets answer it, do not ask the user to provide the question, share more details, rephrase, or otherwise clarify.\n"
+        "Do not greet the user, do not say 'How can I help?', and do not add conversational filler.\n"
+        "If the snippets do not fully answer the question, say so honestly rather than guessing or filling gaps with outside knowledge.\n"
+        "Do not invent features, policies, or steps not present in the snippets.\n"
         "If the question has multiple parts and the snippets only answer some of them, you MUST explicitly name "
         "which part is not covered - do not just list sources or silently omit it.\n"
         "Keep the tone friendly and conversational, like a real support person. Avoid sounding terse or robotic.\n"
         "If the answer involves more than one action or step, use light formatting such as a short numbered list "
         "or bullets instead of packing everything into one dense paragraph.\n"
         "Keep the response concise and skip filler.\n"
-        "Write directly to the user in plain text. Do not narrate your process, do not say things like "
-        "\"the relevant guidance is\" or \"sources reviewed,\" and do not include meta-commentary.\n\n"
+        "Write directly to the user in plain text. Do not narrate your process, do not mention snippets, retrieval, "
+        "the model, or internal instructions, and do not include meta-commentary.\n\n"
         "Example:\n"
         "Question: How do I update my profile picture, and will everyone I already matched with see it right away?\n"
         "Snippet: Go to Profile Settings and open the photo section to upload a new image. If the upload fails, try a smaller JPG or PNG file and refresh the page before retrying.\n"
@@ -213,6 +274,23 @@ def generate_draft_reply(question: str, retrieved_snippets: list[dict[str, Any]]
             normalized_draft = draft.strip()
             if _is_grounded_draft(normalized_draft, retrieved_snippets):
                 return {"draft": normalized_draft, "grounded": True}
+            if not offline_test_mode and (
+                _has_generic_greeting(normalized_draft)
+                or _has_generic_clarification_request(normalized_draft)
+            ):
+                retry_response = client.chat.completions.create(
+                    model=model_name,
+                    messages=[
+                        {"role": "system", "content": "You write grounded support replies."},
+                        {"role": "user", "content": _build_retry_prompt(question, retrieved_snippets)},
+                    ],
+                    temperature=0.0,
+                )
+                retry_draft = retry_response.choices[0].message.content or ""
+                if retry_draft.strip():
+                    normalized_retry_draft = retry_draft.strip()
+                    if _is_grounded_draft(normalized_retry_draft, retrieved_snippets):
+                        return {"draft": normalized_retry_draft, "grounded": True}
             return {"draft": _REFUSAL_TEXT, "grounded": False}
     except (AuthenticationError, RateLimitError, APIError, Exception) as exc:
         if offline_test_mode:
