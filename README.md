@@ -42,6 +42,7 @@ Create a `backend/.env` file with your Groq API key from the repository root:
 cd backend
 @"
 GROQ_API_KEY=your_groq_api_key_here
+GROQ_MODEL=openai/gpt-oss-120b
 "@ | Set-Content .env
 ```
 

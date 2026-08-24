@@ -28,7 +28,7 @@ class GenerationError(RuntimeError):
     """Raised when grounded reply generation fails."""
 
 
-_MODEL_NAME = "llama-3.3-70b-versatile"
+_DEFAULT_MODEL_NAME = "openai/gpt-oss-120b"
 _REFUSAL_TEXT = (
     "I don't have enough information in the help content to answer this confidently. "
     "Could you try rephrasing, or this may need a human to look into it."
@@ -173,6 +173,7 @@ def generate_draft_reply(question: str, retrieved_snippets: list[dict[str, Any]]
     if not api_key:
         raise GenerationError("GROQ_API_KEY is not set in the environment.")
 
+    model_name = os.getenv("GROQ_MODEL", _DEFAULT_MODEL_NAME)
     offline_test_mode = os.getenv("OFFLINE_TEST_MODE", "").lower() in {"1", "true", "yes"}
 
     context = _format_context(retrieved_snippets)
@@ -200,7 +201,7 @@ def generate_draft_reply(question: str, retrieved_snippets: list[dict[str, Any]]
     client = Groq(api_key=api_key)
     try:
         response = client.chat.completions.create(
-            model=_MODEL_NAME,
+            model=model_name,
             messages=[
                 {"role": "system", "content": "You write grounded support replies."},
                 {"role": "user", "content": prompt},
